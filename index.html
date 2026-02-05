@@ -8,7 +8,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js für die großen Diagramme -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Fonts -->
@@ -25,7 +25,13 @@
                         appleBg: '#F5F5F7',
                         darkBg: '#000000',
                         darkCard: '#1C1C1E',
-                        darkSeparator: '#38383A'
+                        darkSeparator: '#38383A',
+                        // Apple-inspired "Heat" Palette (Chroma)
+                        heat1: '#64D2FF', // Blue (Cool/Low)
+                        heat2: '#5AC8FA', // Light Blue
+                        heat3: '#FFCC00', // Yellow (Neutral/Mid)
+                        heat4: '#FF9500', // Orange
+                        heat5: '#FF3B30', // Red (Warm/High)
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -34,13 +40,12 @@
     </script>
     
     <style>
-        /* Smooth Mode Transition */
         body { 
             transition: background-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.5s ease; 
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* --- Parallax Background --- */
+        /* Parallax Background */
         .parallax-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; overflow: hidden; pointer-events: none;
@@ -49,42 +54,25 @@
             position: absolute; border-radius: 50%; filter: blur(60px);
             opacity: 0.4; transition: all 1s ease; will-change: transform;
         }
-        
-        /* Light Mode Gradients */
-        .light .blob-1 { 
-            background: radial-gradient(circle, rgba(0,122,255,0.4) 0%, rgba(0,122,255,0) 70%);
-            width: 100vw; height: 100vw; top: -20%; right: -20%; opacity: 0.4;
-            animation: float 20s infinite alternate;
-        }
-        .light .blob-2 { 
-            background: radial-gradient(circle, rgba(175,82,222,0.4) 0%, rgba(175,82,222,0) 70%);
-            width: 80vw; height: 80vw; bottom: -10%; left: -10%; opacity: 0.3;
-            animation: float 25s infinite alternate-reverse;
-        }
-        
-        /* Dark Mode Gradients */
-        .dark .blob-1 { background: radial-gradient(circle, rgba(10,132,255,0.2) 0%, rgba(0,0,0,0) 70%); opacity: 0.5; }
-        .dark .blob-2 { background: radial-gradient(circle, rgba(191,90,242,0.2) 0%, rgba(0,0,0,0) 70%); opacity: 0.4; }
+        .light .blob-1 { background: radial-gradient(circle, rgba(0,122,255,0.3) 0%, rgba(0,122,255,0) 70%); width: 100vw; height: 100vw; top: -20%; right: -20%; animation: float 20s infinite alternate; }
+        .light .blob-2 { background: radial-gradient(circle, rgba(175,82,222,0.2) 0%, rgba(175,82,222,0) 70%); width: 80vw; height: 80vw; bottom: -10%; left: -10%; animation: float 25s infinite alternate-reverse; }
+        .dark .blob-1 { background: radial-gradient(circle, rgba(10,132,255,0.15) 0%, rgba(0,0,0,0) 70%); }
+        .dark .blob-2 { background: radial-gradient(circle, rgba(191,90,242,0.1) 0%, rgba(0,0,0,0) 70%); }
 
-        @keyframes float {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(20px, 30px); }
-        }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, 30px); } }
 
         .light body { background-color: #F5F5F7; color: #1d1d1f; }
         .dark body { background-color: #000000; color: #F5F5F7; }
 
-        /* --- Cards & UI Elements --- */
         .card {
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
         
-        /* Mode Switch - Mobile Optimized Size */
         .mode-switch {
             width: 54px; height: 30px; background: #E9E9EA; border-radius: 100px;
-            position: relative; cursor: pointer; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            position: relative; cursor: pointer; transition: 0.3s;
         }
         .dark .mode-switch { background: #30D158; }
         .mode-switch::after {
@@ -94,17 +82,12 @@
         }
         .dark .mode-switch::after { left: 26px; }
 
-        /* Animations */
         .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Akkordeon Styles */
         .accordion-content { transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
         .accordion-item.open .accordion-content { max-height: 600px; opacity: 1; }
         .accordion-item.open .chevron { transform: rotate(90deg); }
-        
-        /* Chart Container */
-        .chart-container { position: relative; width: 100%; }
     </style>
 </head>
 <body class="antialiased">
@@ -147,120 +130,74 @@
             </p>
         </header>
 
-        <!-- Einleitung -->
-        <section class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl reveal">
-            <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-3">
-                <span class="bg-black dark:bg-white text-white dark:text-black w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm">1</span>
-                Überblick
-            </h2>
-            <p class="text-sm md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                Diese Analyse visualisiert die Ergebnisse eines Fragebogens zur Einsamkeit. Die Antworten wurden auf einer 
-                <span class="font-semibold text-appleBlue">5-stufigen Likert-Skala</span> erfasst (1-5).
-                Nachfolgend finden Sie interaktive Auswertungen zu Konsens und Divergenz.
-            </p>
-        </section>
-
         <!-- Deskriptive Statistik -->
         <section class="reveal">
-            <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 px-2">Statistische Kennwerte</h2>
-            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl overflow-hidden border border-white/20 shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 px-2">Statistische Kennwerte</h2>
+            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-3xl overflow-hidden border border-white/20 shadow-xl">
                 <div class="overflow-x-auto scrollbar-hide">
-                    <table class="w-full text-left border-collapse min-w-[600px] md:min-w-full">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead>
-                            <tr class="bg-gray-50/50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 text-[10px] md:text-xs uppercase tracking-wider text-appleGray">
-                                <th class="p-4 md:p-6 font-semibold">Frage</th>
-                                <th class="p-4 md:p-6 font-semibold text-right">Ø Mittelwert</th>
-                                <th class="p-4 md:p-6 font-semibold text-right">Median</th>
-                                <th class="p-4 md:p-6 font-semibold text-right">σ Std.Abw</th>
-                                <th class="p-4 md:p-6">Tendenz</th>
+                            <tr class="bg-gray-50/50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 text-[10px] uppercase tracking-wider text-appleGray">
+                                <th class="p-6 font-semibold">Frage</th>
+                                <th class="p-6 font-semibold text-right">Ø Mittelwert</th>
+                                <th class="p-6 font-semibold text-right">Median</th>
+                                <th class="p-6 font-semibold text-right">σ Std.Abw</th>
+                                <th class="p-6">Tendenz</th>
                             </tr>
                         </thead>
-                        <tbody id="stats-table-body" class="divide-y divide-gray-100 dark:divide-white/5 text-xs md:text-sm font-medium">
-                            <!-- JS füllt -->
+                        <tbody id="stats-table-body" class="divide-y divide-gray-100 dark:divide-white/5 text-sm font-medium">
                         </tbody>
                     </table>
                 </div>
             </div>
-            <p class="text-[10px] text-appleGray mt-3 px-2 md:hidden italic">Tipp: Tabelle seitlich wischen für mehr Details.</p>
         </section>
 
-        <!-- Grafiken Grid -->
-        <section class="reveal space-y-6 md:space-y-8">
-            <h2 class="text-2xl md:text-3xl font-bold px-2">Visuelle Analyse</h2>
+        <!-- Visuelle Analyse -->
+        <section class="reveal space-y-6">
+            <h2 class="text-2xl font-bold px-2">Visuelle Analyse</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <!-- Heatmap -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl md:col-span-2">
-                    <div class="mb-4 md:mb-6">
-                        <h3 class="text-lg md:text-xl font-bold">Antwortverteilung</h3>
-                        <p class="text-xs text-appleGray mt-1">Häufigkeit der Antworten (1-5) pro Frage</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Heatmap mit Apple Chromatic Palette -->
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl md:col-span-2">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold">Antwortverteilung</h3>
+                        <p class="text-xs text-appleGray mt-1">Frequenz der Antwortwerte (1-5) | Heatmap-Kontrast</p>
                     </div>
-                    <div class="h-64 md:h-80 w-full chart-container">
+                    <div class="h-64 md:h-80 w-full relative">
                         <canvas id="heatmapChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Range Chart -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl">
-                    <h3 class="text-lg md:text-xl font-bold mb-1 md:mb-2">Spannweite</h3>
-                    <p class="text-xs text-appleGray mb-4 md:mb-6">Min bis Max & Mittelwert</p>
-                    <div class="h-56 md:h-64 w-full chart-container">
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl">
+                    <h3 class="text-lg font-bold mb-2">Spannweite</h3>
+                    <div class="h-56 w-full relative">
                         <canvas id="rangeChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Radar Chart -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl">
-                    <h3 class="text-lg md:text-xl font-bold mb-1 md:mb-2">Fragenprofil</h3>
-                    <p class="text-xs text-appleGray mb-4 md:mb-6">Durchschnittliche Zustimmung</p>
-                    <div class="h-56 md:h-64 w-full flex justify-center chart-container">
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl">
+                    <h3 class="text-lg font-bold mb-2">Fragenprofil</h3>
+                    <div class="h-56 w-full flex justify-center relative">
                         <canvas id="radarChart"></canvas>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Detail Analyse -->
+        <!-- Boxplots -->
         <section class="reveal">
-            <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 px-2">Detail-Analyse</h2>
-            
-            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl border border-white/20 shadow-xl overflow-hidden backdrop-blur-xl">
+            <h2 class="text-2xl font-bold mb-6 px-2">Verteilungsdetails</h2>
+            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-3xl border border-white/20 shadow-xl overflow-hidden">
                 <div id="boxplot-list" class="divide-y divide-gray-200 dark:divide-darkSeparator">
-                    <!-- JS füllt -->
-                </div>
-            </div>
-            <p class="text-[10px] md:text-xs text-center text-appleGray mt-4 px-4 leading-tight">
-                Legende Boxplot: Balken = Min/Max, Box = Q1-Q3 (Quartilabstand), Strich = Median, Punkt = Mittelwert.
-            </p>
-        </section>
-
-        <!-- Fazit -->
-        <section class="card bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-2xl reveal border border-white/10">
-            <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-                <div class="p-3 md:p-4 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
-                    <svg class="w-6 h-6 md:w-8 md:h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div class="space-y-3 md:space-y-4">
-                    <h2 class="text-xl md:text-2xl font-bold">Zusammenfassung</h2>
-                    <ul class="space-y-3 text-sm md:text-base text-gray-300">
-                        <li class="flex gap-3">
-                            <span class="text-blue-400 font-bold">•</span>
-                            <span><strong>Polarisierung:</strong> Fragen wie Q04 und Q13 zeigen hohe Streuung (Meinungsverschiedenheit).</span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="text-green-400 font-bold">•</span>
-                            <span><strong>Konsens:</strong> Bei Q07 und Q11 sind sich die Teilnehmer weitgehend einig.</span>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Scripts -->
     <script>
-        // --- Daten ---
         const rawData = {
             Q01: [4,1,2,2,5,1,2,1,3,3,4], Q02: [4,2,2,3,2,1,2,2,3,3,2],
             Q03: [4,1,1,1,3,1,3,1,2,2,2], Q04: [5,4,4,5,5,1,5,5,2,1,4],
@@ -271,7 +208,15 @@
             Q13: [3,4,4,3,2,4,3,4,4,4,5]
         };
 
-        // --- Hilfsfunktionen ---
+        // Apple Chromatic Heat Colors
+        const heatmapColors = [
+            '#64D2FF', // 1: Blau (Kühl)
+            '#5AC8FA', // 2: Hellblau
+            '#FFCC00', // 3: Gold (Mittel)
+            '#FF9500', // 4: Orange
+            '#FF3B30'  // 5: Rot (Warm)
+        ];
+
         const calcMean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
         const calcSD = arr => {
             const m = calcMean(arr);
@@ -284,10 +229,13 @@
         };
         const getQuartiles = arr => {
             const sorted = [...arr].sort((a,b) => a-b);
-            const q1 = sorted[Math.floor((sorted.length / 4))]; 
-            const q2 = getMedian(sorted);
-            const q3 = sorted[Math.floor((sorted.length * (3/4)))];
-            return { min: sorted[0], q1, median: q2, q3, max: sorted[sorted.length-1] };
+            return { 
+                min: sorted[0], 
+                q1: sorted[Math.floor(sorted.length / 4)], 
+                median: getMedian(sorted), 
+                q3: sorted[Math.floor(sorted.length * 0.75)], 
+                max: sorted[sorted.length-1] 
+            };
         };
 
         const statsData = Object.keys(rawData).map(key => {
@@ -302,107 +250,54 @@
             return { id: key, mean, meanStr: mean.toFixed(2), sd: sd.toFixed(2), quartiles, cat, colorClass, values };
         });
 
-        // --- Boxplot SVG ---
-        function createBoxplotSVG(q, mean) {
-            const map = val => ((val - 1) / 4) * 88 + 6; 
-            const strokeColor = "currentColor";
-            return `
-                <svg width="100%" height="40" class="overflow-visible text-gray-800 dark:text-gray-200">
-                    <line x1="6%" y1="20" x2="94%" y2="20" stroke="${strokeColor}" stroke-opacity="0.1" stroke-width="1" />
-                    <line x1="${map(q.min)}%" y1="20" x2="${map(q.q1)}%" y2="20" stroke="${strokeColor}" stroke-width="1.5" />
-                    <line x1="${map(q.q3)}%" y1="20" x2="${map(q.max)}%" y2="20" stroke="${strokeColor}" stroke-width="1.5" />
-                    <line x1="${map(q.min)}%" y1="15" x2="${map(q.min)}%" y2="25" stroke="${strokeColor}" stroke-width="1.5" />
-                    <line x1="${map(q.max)}%" y1="15" x2="${map(q.max)}%" y2="25" stroke="${strokeColor}" stroke-width="1.5" />
-                    <rect x="${map(q.q1)}%" y="10" width="${map(q.q3) - map(q.q1)}%" height="20" rx="3" fill="currentColor" fill-opacity="0.1" stroke="${strokeColor}" stroke-width="1.5" />
-                    <line x1="${map(q.median)}%" y1="10" x2="${map(q.median)}%" y2="30" stroke="${strokeColor}" stroke-width="2.5" />
-                    <circle cx="${map(mean)}%" cy="20" r="3.5" class="text-blue-500 fill-current" stroke="white" stroke-width="1" />
-                </svg>
-            `;
-        }
-
-        // --- Render UI ---
+        // UI Rendering
         const tableBody = document.getElementById('stats-table-body');
         statsData.forEach(item => {
             const row = document.createElement('tr');
             row.className = "hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors";
             row.innerHTML = `
-                <td class="p-4 md:p-6 font-mono text-appleBlue font-bold">${item.id}</td>
-                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.meanStr}</td>
-                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.quartiles.median}</td>
-                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.sd}</td>
-                <td class="p-4 md:p-6"><span class="px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[9px] md:text-xs font-bold ${item.colorClass}">${item.cat}</span></td>
+                <td class="p-6 font-mono text-appleBlue font-bold">${item.id}</td>
+                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.meanStr}</td>
+                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.quartiles.median}</td>
+                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.sd}</td>
+                <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-bold ${item.colorClass}">${item.cat}</span></td>
             `;
             tableBody.appendChild(row);
         });
 
-        const boxplotList = document.getElementById('boxplot-list');
-        statsData.forEach(item => {
-            const div = document.createElement('div');
-            div.className = "accordion-item group cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors";
-            div.onclick = function() { this.classList.toggle('open'); };
-            div.innerHTML = `
-                <div class="flex items-center justify-between p-4 md:p-5 select-none">
-                    <div class="flex items-center gap-3 md:gap-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold font-mono text-xs md:text-sm">
-                            ${item.id}
-                        </div>
-                        <div>
-                            <div class="font-semibold text-sm md:text-base dark:text-gray-200">${item.id}</div>
-                            <div class="text-[10px] md:text-xs text-appleGray mt-0.5">Mittelwert Ø ${item.meanStr}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 md:gap-3">
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${item.colorClass}">${item.cat}</span>
-                        <svg class="chevron w-4 h-4 md:w-5 md:h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                </div>
-                <div class="accordion-content bg-gray-50/30 dark:bg-black/20">
-                    <div class="p-5 md:p-6 border-t border-gray-100 dark:border-white/5">
-                        <div class="mb-3 text-[9px] font-bold text-appleGray uppercase tracking-widest">Verteilungs-Boxplot</div>
-                        ${createBoxplotSVG(item.quartiles, item.mean)}
-                        <div class="mt-4 flex justify-between text-[10px] text-gray-400">
-                            <span>Min: ${item.quartiles.min}</span>
-                            <span>Q1: ${item.quartiles.q1}</span>
-                            <span>Med: ${item.quartiles.median}</span>
-                            <span>Q3: ${item.quartiles.q3}</span>
-                            <span>Max: ${item.quartiles.max}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            boxplotList.appendChild(div);
-        });
-
-        // --- Charts ---
+        // Charts
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#8E8E93';
-        const labels = statsData.map(d => d.id);
 
         new Chart(document.getElementById('heatmapChart'), {
             type: 'bar',
             data: { 
-                labels: labels, 
+                labels: statsData.map(d => d.id), 
                 datasets: [1,2,3,4,5].map((val, i) => ({
-                    label: `Antw. ${val}`,
+                    label: `${val}`,
                     data: statsData.map(d => d.values.filter(v => v === val).length),
-                    backgroundColor: ['#34C759', '#86EA96', '#FFD60A', '#FF9F0A', '#FF3B30'][i],
-                    borderRadius: 2
+                    backgroundColor: heatmapColors[i],
+                    borderRadius: 4,
+                    barPercentage: 0.8
                 }))
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, grid: {color:'rgba(128,128,128,0.05)'} } },
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                scales: { 
+                    x: { stacked: true, grid: {display:false}, border: {display:false} }, 
+                    y: { stacked: true, grid: {color:'rgba(128,128,128,0.05)'}, border: {display:false} } 
+                },
+                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20 } } }
             }
         });
 
         new Chart(document.getElementById('rangeChart'), {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: statsData.map(d => d.id),
                 datasets: [
-                    { label: 'Bereich', data: statsData.map(d => [d.quartiles.min, d.quartiles.max]), backgroundColor: 'rgba(0, 122, 255, 0.15)', borderColor: '#007AFF', borderWidth: 1, barPercentage: 0.5 },
-                    { type: 'scatter', label: 'Mean', data: statsData.map(d => d.mean), backgroundColor: '#AF52DE', pointRadius: 4 }
+                    { label: 'Bereich', data: statsData.map(d => [d.quartiles.min, d.quartiles.max]), backgroundColor: 'rgba(0, 122, 255, 0.1)', borderColor: 'rgba(0, 122, 255, 0.4)', borderWidth: 1, borderRadius: 20, barPercentage: 0.4 },
+                    { type: 'scatter', label: 'Mean', data: statsData.map(d => d.mean), backgroundColor: '#007AFF', pointRadius: 4, pointHoverRadius: 6 }
                 ]
             },
             options: {
@@ -415,8 +310,8 @@
         new Chart(document.getElementById('radarChart'), {
             type: 'radar',
             data: {
-                labels: labels,
-                datasets: [{ label: 'Ø Zustimmung', data: statsData.map(d => d.mean), backgroundColor: 'rgba(10, 132, 255, 0.15)', borderColor: '#0A84FF', pointBackgroundColor: '#fff', borderWidth: 2 }]
+                labels: statsData.map(d => d.id),
+                datasets: [{ data: statsData.map(d => d.mean), backgroundColor: 'rgba(10, 132, 255, 0.1)', borderColor: '#0A84FF', borderWidth: 2, pointRadius: 0 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -425,9 +320,53 @@
             }
         });
 
+        // Boxplot Creator
+        const boxplotList = document.getElementById('boxplot-list');
+        statsData.forEach(item => {
+            const q = item.quartiles;
+            const map = val => ((val - 1) / 4) * 90 + 5;
+            const div = document.createElement('div');
+            div.className = "accordion-item group cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors";
+            div.onclick = function() { this.classList.toggle('open'); };
+            div.innerHTML = `
+                <div class="flex items-center justify-between p-5 select-none">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold font-mono text-sm">
+                            ${item.id}
+                        </div>
+                        <div>
+                            <div class="font-semibold text-base dark:text-gray-200">Frage ${item.id.replace('Q','')}</div>
+                            <div class="text-xs text-appleGray">Ø ${item.meanStr} | σ ${item.sd}</div>
+                        </div>
+                    </div>
+                    <svg class="chevron w-5 h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="p-8 border-t border-gray-100 dark:border-white/5">
+                        <svg width="100%" height="40" class="overflow-visible text-gray-800 dark:text-gray-200">
+                            <line x1="5%" y1="20" x2="95%" y2="20" stroke="currentColor" stroke-opacity="0.1" stroke-width="1" />
+                            <line x1="${map(q.min)}%" y1="20" x2="${map(q.q1)}%" y2="20" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="${map(q.q3)}%" y1="20" x2="${map(q.max)}%" y2="20" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="${map(q.q1)}%" y="10" width="${map(q.q3)-map(q.q1)}%" height="20" rx="3" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.5" />
+                            <line x1="${map(q.median)}%" y1="10" x2="${map(q.median)}%" y2="30" stroke="currentColor" stroke-width="2.5" />
+                            <circle cx="${map(item.mean)}%" cy="20" r="4" class="text-blue-500 fill-current" stroke="white" stroke-width="1" />
+                        </svg>
+                        <div class="mt-4 flex justify-between text-[10px] text-appleGray font-medium uppercase tracking-tighter">
+                            <span>Min: ${q.min}</span>
+                            <span>Q1: ${q.q1}</span>
+                            <span>Med: ${q.median}</span>
+                            <span>Q3: ${q.q3}</span>
+                            <span>Max: ${q.max}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            boxplotList.appendChild(div);
+        });
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
-        }, { threshold: 0.05 });
+        }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
