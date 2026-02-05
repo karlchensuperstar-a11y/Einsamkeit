@@ -35,7 +35,10 @@
     
     <style>
         /* Smooth Mode Transition */
-        body { transition: background-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.5s ease; }
+        body { 
+            transition: background-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.5s ease; 
+            -webkit-tap-highlight-color: transparent;
+        }
         
         /* --- Parallax Background --- */
         .parallax-bg {
@@ -43,29 +46,29 @@
             z-index: -1; overflow: hidden; pointer-events: none;
         }
         .blob {
-            position: absolute; border-radius: 50%; filter: blur(80px);
+            position: absolute; border-radius: 50%; filter: blur(60px);
             opacity: 0.4; transition: all 1s ease; will-change: transform;
         }
         
         /* Light Mode Gradients */
         .light .blob-1 { 
             background: radial-gradient(circle, rgba(0,122,255,0.4) 0%, rgba(0,122,255,0) 70%);
-            width: 70vw; height: 70vw; top: -20%; right: -20%; opacity: 0.4;
+            width: 100vw; height: 100vw; top: -20%; right: -20%; opacity: 0.4;
             animation: float 20s infinite alternate;
         }
         .light .blob-2 { 
             background: radial-gradient(circle, rgba(175,82,222,0.4) 0%, rgba(175,82,222,0) 70%);
-            width: 60vw; height: 60vw; bottom: -10%; left: -10%; opacity: 0.3;
+            width: 80vw; height: 80vw; bottom: -10%; left: -10%; opacity: 0.3;
             animation: float 25s infinite alternate-reverse;
         }
         
-        /* Dark Mode Gradients (Subtiler) */
-        .dark .blob-1 { background: radial-gradient(circle, rgba(10,132,255,0.25) 0%, rgba(0,0,0,0) 70%); opacity: 0.5; }
-        .dark .blob-2 { background: radial-gradient(circle, rgba(191,90,242,0.25) 0%, rgba(0,0,0,0) 70%); opacity: 0.4; }
+        /* Dark Mode Gradients */
+        .dark .blob-1 { background: radial-gradient(circle, rgba(10,132,255,0.2) 0%, rgba(0,0,0,0) 70%); opacity: 0.5; }
+        .dark .blob-2 { background: radial-gradient(circle, rgba(191,90,242,0.2) 0%, rgba(0,0,0,0) 70%); opacity: 0.4; }
 
         @keyframes float {
             0% { transform: translate(0, 0); }
-            100% { transform: translate(30px, 50px); }
+            100% { transform: translate(20px, 30px); }
         }
 
         .light body { background-color: #F5F5F7; color: #1d1d1f; }
@@ -73,36 +76,38 @@
 
         /* --- Cards & UI Elements --- */
         .card {
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
-        .card:hover { transform: scale(1.01); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
-
-        /* Mode Switch */
+        
+        /* Mode Switch - Mobile Optimized Size */
         .mode-switch {
-            width: 50px; height: 28px; background: #E9E9EA; border-radius: 100px;
+            width: 54px; height: 30px; background: #E9E9EA; border-radius: 100px;
             position: relative; cursor: pointer; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
         .dark .mode-switch { background: #30D158; }
         .mode-switch::after {
-            content: ''; position: absolute; width: 24px; height: 24px;
+            content: ''; position: absolute; width: 26px; height: 26px;
             background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        .dark .mode-switch::after { left: 24px; }
+        .dark .mode-switch::after { left: 26px; }
 
         /* Animations */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
         /* Akkordeon Styles */
         .accordion-content { transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        .accordion-item.open .accordion-content { max-height: 500px; opacity: 1; }
+        .accordion-item.open .accordion-content { max-height: 600px; opacity: 1; }
         .accordion-item.open .chevron { transform: rotate(90deg); }
+        
+        /* Chart Container */
+        .chart-container { position: relative; width: 100%; }
     </style>
 </head>
-<body>
+<body class="antialiased">
 
     <!-- Parallax Hintergrund -->
     <div class="parallax-bg">
@@ -111,139 +116,140 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 px-6 py-4 backdrop-blur-xl bg-white/70 dark:bg-black/70 border-b border-gray-200/50 dark:border-white/10 transition-colors">
+    <nav class="sticky top-0 z-50 px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl bg-white/70 dark:bg-black/70 border-b border-gray-200/50 dark:border-white/10 transition-colors">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md text-white font-bold">
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md text-white font-bold text-sm md:text-base">
                     A
                 </div>
-                <span class="font-semibold text-lg tracking-tight">Analyse Dashboard</span>
+                <span class="font-semibold text-base md:text-lg tracking-tight">Analyse</span>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-xs font-medium text-appleGray uppercase tracking-wide">Mode</span>
+                <span class="hidden sm:inline text-xs font-medium text-appleGray uppercase tracking-wide">Mode</span>
                 <div class="mode-switch" onclick="document.documentElement.classList.toggle('dark'); document.documentElement.classList.toggle('light');"></div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-6 py-12 space-y-20">
+    <main class="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-12 md:space-y-20">
 
         <!-- Header -->
-        <header class="text-center space-y-6 reveal active">
-            <div class="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-2 border border-blue-500/20">
+        <header class="text-center space-y-4 md:space-y-6 reveal active">
+            <div class="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1 border border-blue-500/20">
                 Data Science
             </div>
-            <h1 class="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 pb-2 leading-tight">
+            <h1 class="text-4xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 pb-1 leading-tight">
                 Einsamkeitsskala
             </h1>
-            <p class="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p class="text-base md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed px-2">
                 Statistische Auswertung der Verteilung, Streuung und Polarisierung (N=11).
             </p>
         </header>
 
         <!-- Einleitung -->
-        <section class="card bg-white/70 dark:bg-darkCard/70 rounded-3xl p-8 md:p-10 border border-white/20 shadow-xl reveal">
-            <h2 class="text-2xl font-bold mb-4 flex items-center gap-3">
-                <span class="bg-black dark:bg-white text-white dark:text-black w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+        <section class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl p-6 md:p-10 border border-white/20 shadow-xl reveal">
+            <h2 class="text-xl md:text-2xl font-bold mb-4 flex items-center gap-3">
+                <span class="bg-black dark:bg-white text-white dark:text-black w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm">1</span>
                 Überblick
             </h2>
-            <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p class="text-sm md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                 Diese Analyse visualisiert die Ergebnisse eines Fragebogens zur Einsamkeit. Die Antworten wurden auf einer 
-                <span class="font-semibold text-appleBlue">5-stufigen Likert-Skala</span> erfasst (1 = stimme gar nicht zu, 5 = stimme voll zu).
-                Nachfolgend finden Sie interaktive Auswertungen zu Konsens und Divergenz innerhalb der Testgruppe.
+                <span class="font-semibold text-appleBlue">5-stufigen Likert-Skala</span> erfasst (1-5).
+                Nachfolgend finden Sie interaktive Auswertungen zu Konsens und Divergenz.
             </p>
         </section>
 
-        <!-- Deskriptive Statistik (Tabelle) -->
+        <!-- Deskriptive Statistik -->
         <section class="reveal">
-            <h2 class="text-3xl font-bold mb-8 px-2">Statistische Kennwerte</h2>
-            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-3xl overflow-hidden border border-white/20 shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 px-2">Statistische Kennwerte</h2>
+            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl overflow-hidden border border-white/20 shadow-xl">
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full text-left border-collapse min-w-[600px] md:min-w-full">
                         <thead>
-                            <tr class="bg-gray-50/50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 text-xs uppercase tracking-wider text-appleGray">
-                                <th class="p-6 font-semibold">Frage</th>
-                                <th class="p-6 font-semibold text-right">Ø Mittelwert</th>
-                                <th class="p-6 font-semibold text-right">Median</th>
-                                <th class="p-6 font-semibold text-right">σ Std.Abw</th>
-                                <th class="p-6 font-semibold">Tendenz</th>
+                            <tr class="bg-gray-50/50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 text-[10px] md:text-xs uppercase tracking-wider text-appleGray">
+                                <th class="p-4 md:p-6 font-semibold">Frage</th>
+                                <th class="p-4 md:p-6 font-semibold text-right">Ø Mittelwert</th>
+                                <th class="p-4 md:p-6 font-semibold text-right">Median</th>
+                                <th class="p-4 md:p-6 font-semibold text-right">σ Std.Abw</th>
+                                <th class="p-4 md:p-6">Tendenz</th>
                             </tr>
                         </thead>
-                        <tbody id="stats-table-body" class="divide-y divide-gray-100 dark:divide-white/5 text-sm font-medium">
-                            <!-- Wird per JS gefüllt -->
+                        <tbody id="stats-table-body" class="divide-y divide-gray-100 dark:divide-white/5 text-xs md:text-sm font-medium">
+                            <!-- JS füllt -->
                         </tbody>
                     </table>
                 </div>
             </div>
+            <p class="text-[10px] text-appleGray mt-3 px-2 md:hidden italic">Tipp: Tabelle seitlich wischen für mehr Details.</p>
         </section>
 
         <!-- Grafiken Grid -->
-        <section class="reveal">
-            <h2 class="text-3xl font-bold mb-8 px-2">Visuelle Analyse</h2>
+        <section class="reveal space-y-6 md:space-y-8">
+            <h2 class="text-2xl md:text-3xl font-bold px-2">Visuelle Analyse</h2>
             
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <!-- Heatmap -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl col-span-2">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-bold">Antwortverteilung</h3>
-                        <p class="text-sm text-appleGray mt-1">Häufigkeit der Antworten (1-5) pro Frage</p>
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl md:col-span-2">
+                    <div class="mb-4 md:mb-6">
+                        <h3 class="text-lg md:text-xl font-bold">Antwortverteilung</h3>
+                        <p class="text-xs text-appleGray mt-1">Häufigkeit der Antworten (1-5) pro Frage</p>
                     </div>
-                    <div class="h-80 w-full">
+                    <div class="h-64 md:h-80 w-full chart-container">
                         <canvas id="heatmapChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Range Chart -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl">
-                    <h3 class="text-xl font-bold mb-2">Spannweite</h3>
-                    <p class="text-sm text-appleGray mb-6">Min bis Max & Mittelwert (Punkt)</p>
-                    <div class="h-64 w-full">
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl">
+                    <h3 class="text-lg md:text-xl font-bold mb-1 md:mb-2">Spannweite</h3>
+                    <p class="text-xs text-appleGray mb-4 md:mb-6">Min bis Max & Mittelwert</p>
+                    <div class="h-56 md:h-64 w-full chart-container">
                         <canvas id="rangeChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Radar Chart -->
-                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-3xl p-6 border border-white/20 shadow-xl">
-                    <h3 class="text-xl font-bold mb-2">Fragenprofil</h3>
-                    <p class="text-sm text-appleGray mb-6">Durchschnittliche Zustimmung</p>
-                    <div class="h-64 w-full flex justify-center">
+                <div class="card bg-white/80 dark:bg-darkCard/80 rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/20 shadow-xl">
+                    <h3 class="text-lg md:text-xl font-bold mb-1 md:mb-2">Fragenprofil</h3>
+                    <p class="text-xs text-appleGray mb-4 md:mb-6">Durchschnittliche Zustimmung</p>
+                    <div class="h-56 md:h-64 w-full flex justify-center chart-container">
                         <canvas id="radarChart"></canvas>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Detail Analyse (Interaktive Boxplots) -->
+        <!-- Detail Analyse -->
         <section class="reveal">
-            <h2 class="text-3xl font-bold mb-8 px-2">Detail-Analyse pro Frage</h2>
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 px-2">Detail-Analyse</h2>
             
-            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-3xl border border-white/20 shadow-xl overflow-hidden backdrop-blur-xl">
+            <div class="card bg-white/70 dark:bg-darkCard/70 rounded-2xl md:rounded-3xl border border-white/20 shadow-xl overflow-hidden backdrop-blur-xl">
                 <div id="boxplot-list" class="divide-y divide-gray-200 dark:divide-darkSeparator">
-                    <!-- Wird per JS gefüllt -->
+                    <!-- JS füllt -->
                 </div>
             </div>
-            <p class="text-xs text-center text-appleGray mt-4">
-                Legende Boxplot: Balken = Min/Max, Box = Quartilabstand (Q1-Q3), Strich = Median, Punkt = Mittelwert.
+            <p class="text-[10px] md:text-xs text-center text-appleGray mt-4 px-4 leading-tight">
+                Legende Boxplot: Balken = Min/Max, Box = Q1-Q3 (Quartilabstand), Strich = Median, Punkt = Mittelwert.
             </p>
         </section>
 
         <!-- Fazit -->
-        <section class="card bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-3xl p-10 shadow-2xl reveal border border-white/10">
-            <div class="flex flex-col md:flex-row gap-8 items-start">
-                <div class="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <section class="card bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl md:rounded-3xl p-6 md:p-10 shadow-2xl reveal border border-white/10">
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+                <div class="p-3 md:p-4 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold">Zusammenfassung</h2>
-                    <ul class="space-y-3 text-gray-300">
+                <div class="space-y-3 md:space-y-4">
+                    <h2 class="text-xl md:text-2xl font-bold">Zusammenfassung</h2>
+                    <ul class="space-y-3 text-sm md:text-base text-gray-300">
                         <li class="flex gap-3">
                             <span class="text-blue-400 font-bold">•</span>
-                            <span><strong>Polarisierung:</strong> Fragen wie Q04 und Q13 zeigen eine hohe Standardabweichung, was auf uneinige Meinungen hindeutet.</span>
+                            <span><strong>Polarisierung:</strong> Fragen wie Q04 und Q13 zeigen hohe Streuung (Meinungsverschiedenheit).</span>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-green-400 font-bold">•</span>
-                            <span><strong>Konsens:</strong> Bei Q07 und Q11 sind sich die Teilnehmer weitgehend einig (geringe Streuung).</span>
+                            <span><strong>Konsens:</strong> Bei Q07 und Q11 sind sich die Teilnehmer weitgehend einig.</span>
                         </li>
                     </ul>
                 </div>
@@ -256,18 +262,12 @@
     <script>
         // --- Daten ---
         const rawData = {
-            Q01: [4,1,2,2,5,1,2,1,3,3,4],
-            Q02: [4,2,2,3,2,1,2,2,3,3,2],
-            Q03: [4,1,1,1,3,1,3,1,2,2,2],
-            Q04: [5,4,4,5,5,1,5,5,2,1,4],
-            Q05: [3,2,1,3,5,5,3,2,4,1,3],
-            Q06: [4,1,1,2,5,2,2,1,3,1,5],
-            Q07: [3,2,1,1,2,1,2,1,1,3,1],
-            Q08: [2,4,3,1,1,3,5,3,2,1,2],
-            Q09: [4,1,2,2,4,1,2,1,4,1,4],
-            Q10: [2,1,2,2,4,1,4,1,3,1,1],
-            Q11: [3,1,1,2,2,2,2,1,2,2,3],
-            Q12: [3,2,1,2,4,1,2,2,2,2,1],
+            Q01: [4,1,2,2,5,1,2,1,3,3,4], Q02: [4,2,2,3,2,1,2,2,3,3,2],
+            Q03: [4,1,1,1,3,1,3,1,2,2,2], Q04: [5,4,4,5,5,1,5,5,2,1,4],
+            Q05: [3,2,1,3,5,5,3,2,4,1,3], Q06: [4,1,1,2,5,2,2,1,3,1,5],
+            Q07: [3,2,1,1,2,1,2,1,1,3,1], Q08: [2,4,3,1,1,3,5,3,2,1,2],
+            Q09: [4,1,2,2,4,1,2,1,4,1,4], Q10: [2,1,2,2,4,1,4,1,3,1,1],
+            Q11: [3,1,1,2,2,2,2,1,2,2,3], Q12: [3,2,1,2,4,1,2,2,2,2,1],
             Q13: [3,4,4,3,2,4,3,4,4,4,5]
         };
 
@@ -282,8 +282,6 @@
             const mid = Math.floor(sorted.length / 2);
             return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
         };
-        
-        // Quartile berechnen für Boxplot
         const getQuartiles = arr => {
             const sorted = [...arr].sort((a,b) => a-b);
             const q1 = sorted[Math.floor((sorted.length / 4))]; 
@@ -292,117 +290,82 @@
             return { min: sorted[0], q1, median: q2, q3, max: sorted[sorted.length-1] };
         };
 
-        // --- Datenaufbereitung ---
         const statsData = Object.keys(rawData).map(key => {
             const values = rawData[key];
             const mean = calcMean(values);
             const sd = calcSD(values);
             const quartiles = getQuartiles(values);
-            
             let cat = "Neutral";
             let colorClass = "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
             if(sd < 0.8) { cat = "Einigkeit"; colorClass = "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"; }
             if(sd >= 1.3) { cat = "Polarisiert"; colorClass = "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300"; }
-
-            return {
-                id: key,
-                mean: mean,
-                meanStr: mean.toFixed(2),
-                sd: sd.toFixed(2),
-                quartiles: quartiles,
-                cat: cat,
-                colorClass: colorClass,
-                values: values
-            };
+            return { id: key, mean, meanStr: mean.toFixed(2), sd: sd.toFixed(2), quartiles, cat, colorClass, values };
         });
 
-        // --- SVG Boxplot Generator ---
+        // --- Boxplot SVG ---
         function createBoxplotSVG(q, mean) {
-            // Mapping 1..5 auf 0..100% (mit Padding)
-            const map = val => ((val - 1) / 4) * 90 + 5; 
-            
-            // Farben (verwende CSS Variablen oder feste Werte passend zum Theme)
+            const map = val => ((val - 1) / 4) * 88 + 6; 
             const strokeColor = "currentColor";
-            const boxFill = "currentColor"; 
-            
             return `
-                <svg width="100%" height="50" class="overflow-visible text-gray-800 dark:text-gray-200">
-                    <!-- Axis -->
-                    <line x1="5%" y1="25" x2="95%" y2="25" stroke="${strokeColor}" stroke-opacity="0.2" stroke-width="1" />
-                    <text x="5%" y="45" font-size="9" fill="currentColor" opacity="0.5" text-anchor="middle">1</text>
-                    <text x="27.5%" y="45" font-size="9" fill="currentColor" opacity="0.5" text-anchor="middle">2</text>
-                    <text x="50%" y="45" font-size="9" fill="currentColor" opacity="0.5" text-anchor="middle">3</text>
-                    <text x="72.5%" y="45" font-size="9" fill="currentColor" opacity="0.5" text-anchor="middle">4</text>
-                    <text x="95%" y="45" font-size="9" fill="currentColor" opacity="0.5" text-anchor="middle">5</text>
-
-                    <!-- Whiskers -->
-                    <line x1="${map(q.min)}%" y1="25" x2="${map(q.q1)}%" y2="25" stroke="${strokeColor}" stroke-width="2" />
-                    <line x1="${map(q.q3)}%" y1="25" x2="${map(q.max)}%" y2="25" stroke="${strokeColor}" stroke-width="2" />
-                    <line x1="${map(q.min)}%" y1="18" x2="${map(q.min)}%" y2="32" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" />
-                    <line x1="${map(q.max)}%" y1="18" x2="${map(q.max)}%" y2="32" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" />
-
-                    <!-- Box -->
-                    <rect x="${map(q.q1)}%" y="15" width="${map(q.q3) - map(q.q1)}%" height="20" rx="4" fill="${boxFill}" fill-opacity="0.15" stroke="${strokeColor}" stroke-width="2" />
-
-                    <!-- Median -->
-                    <line x1="${map(q.median)}%" y1="15" x2="${map(q.median)}%" y2="35" stroke="${strokeColor}" stroke-width="3" />
-                    
-                    <!-- Mean Dot -->
-                    <circle cx="${map(mean)}%" cy="25" r="4" class="text-blue-500 fill-current" stroke="white" stroke-width="1.5" />
+                <svg width="100%" height="40" class="overflow-visible text-gray-800 dark:text-gray-200">
+                    <line x1="6%" y1="20" x2="94%" y2="20" stroke="${strokeColor}" stroke-opacity="0.1" stroke-width="1" />
+                    <line x1="${map(q.min)}%" y1="20" x2="${map(q.q1)}%" y2="20" stroke="${strokeColor}" stroke-width="1.5" />
+                    <line x1="${map(q.q3)}%" y1="20" x2="${map(q.max)}%" y2="20" stroke="${strokeColor}" stroke-width="1.5" />
+                    <line x1="${map(q.min)}%" y1="15" x2="${map(q.min)}%" y2="25" stroke="${strokeColor}" stroke-width="1.5" />
+                    <line x1="${map(q.max)}%" y1="15" x2="${map(q.max)}%" y2="25" stroke="${strokeColor}" stroke-width="1.5" />
+                    <rect x="${map(q.q1)}%" y="10" width="${map(q.q3) - map(q.q1)}%" height="20" rx="3" fill="currentColor" fill-opacity="0.1" stroke="${strokeColor}" stroke-width="1.5" />
+                    <line x1="${map(q.median)}%" y1="10" x2="${map(q.median)}%" y2="30" stroke="${strokeColor}" stroke-width="2.5" />
+                    <circle cx="${map(mean)}%" cy="20" r="3.5" class="text-blue-500 fill-current" stroke="white" stroke-width="1" />
                 </svg>
             `;
         }
 
-        // --- Render Tabelle ---
+        // --- Render UI ---
         const tableBody = document.getElementById('stats-table-body');
         statsData.forEach(item => {
             const row = document.createElement('tr');
             row.className = "hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors";
             row.innerHTML = `
-                <td class="p-6 font-mono text-appleBlue font-bold">${item.id}</td>
-                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.meanStr}</td>
-                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.quartiles.median}</td>
-                <td class="p-6 text-right text-gray-700 dark:text-gray-300">${item.sd}</td>
-                <td class="p-6"><span class="px-3 py-1 rounded-full text-xs font-bold ${item.colorClass}">${item.cat}</span></td>
+                <td class="p-4 md:p-6 font-mono text-appleBlue font-bold">${item.id}</td>
+                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.meanStr}</td>
+                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.quartiles.median}</td>
+                <td class="p-4 md:p-6 text-right text-gray-700 dark:text-gray-300">${item.sd}</td>
+                <td class="p-4 md:p-6"><span class="px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[9px] md:text-xs font-bold ${item.colorClass}">${item.cat}</span></td>
             `;
             tableBody.appendChild(row);
         });
 
-        // --- Render Interaktive Liste (Akkordeon) ---
         const boxplotList = document.getElementById('boxplot-list');
         statsData.forEach(item => {
             const div = document.createElement('div');
             div.className = "accordion-item group cursor-pointer hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors";
-            div.onclick = function() { 
-                // Toggle active class
-                this.classList.toggle('open'); 
-                // Close others (optional, Apple style allows multiple open)
-                // [...boxplotList.children].forEach(c => { if(c !== this) c.classList.remove('open'); });
-            };
-            
+            div.onclick = function() { this.classList.toggle('open'); };
             div.innerHTML = `
-                <div class="flex items-center justify-between p-5 select-none">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold font-mono text-sm">
+                <div class="flex items-center justify-between p-4 md:p-5 select-none">
+                    <div class="flex items-center gap-3 md:gap-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold font-mono text-xs md:text-sm">
                             ${item.id}
                         </div>
                         <div>
-                            <div class="font-semibold dark:text-gray-200">Statistik ${item.id}</div>
-                            <div class="text-xs text-gray-500 mt-0.5">Ø ${item.meanStr} • Med ${item.quartiles.median}</div>
+                            <div class="font-semibold text-sm md:text-base dark:text-gray-200">${item.id}</div>
+                            <div class="text-[10px] md:text-xs text-appleGray mt-0.5">Mittelwert Ø ${item.meanStr}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${item.colorClass}">${item.cat}</span>
-                        <svg class="chevron w-5 h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${item.colorClass}">${item.cat}</span>
+                        <svg class="chevron w-4 h-4 md:w-5 md:h-5 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
                 </div>
                 <div class="accordion-content bg-gray-50/30 dark:bg-black/20">
-                    <div class="p-6 border-t border-gray-100 dark:border-white/5">
-                        <div class="mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Boxplot Analyse</div>
+                    <div class="p-5 md:p-6 border-t border-gray-100 dark:border-white/5">
+                        <div class="mb-3 text-[9px] font-bold text-appleGray uppercase tracking-widest">Verteilungs-Boxplot</div>
                         ${createBoxplotSVG(item.quartiles, item.mean)}
-                        <div class="mt-4 grid grid-cols-2 gap-4 text-xs text-gray-500">
-                            <div>Min: ${item.quartiles.min} | Max: ${item.quartiles.max}</div>
-                            <div class="text-right">Q1: ${item.quartiles.q1} | Q3: ${item.quartiles.q3}</div>
+                        <div class="mt-4 flex justify-between text-[10px] text-gray-400">
+                            <span>Min: ${item.quartiles.min}</span>
+                            <span>Q1: ${item.quartiles.q1}</span>
+                            <span>Med: ${item.quartiles.median}</span>
+                            <span>Q3: ${item.quartiles.q3}</span>
+                            <span>Max: ${item.quartiles.max}</span>
                         </div>
                     </div>
                 </div>
@@ -410,19 +373,17 @@
             boxplotList.appendChild(div);
         });
 
-        // --- Chart.js Config ---
+        // --- Charts ---
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#8E8E93';
-        
         const labels = statsData.map(d => d.id);
 
-        // Heatmap
         new Chart(document.getElementById('heatmapChart'), {
             type: 'bar',
             data: { 
                 labels: labels, 
                 datasets: [1,2,3,4,5].map((val, i) => ({
-                    label: `Antwort ${val}`,
+                    label: `Antw. ${val}`,
                     data: statsData.map(d => d.values.filter(v => v === val).length),
                     backgroundColor: ['#34C759', '#86EA96', '#FFD60A', '#FF9F0A', '#FF3B30'][i],
                     borderRadius: 2
@@ -430,61 +391,44 @@
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, grid: {color:'rgba(128,128,128,0.1)'} } },
-                plugins: { legend: { position: 'bottom' } }
+                scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, grid: {color:'rgba(128,128,128,0.05)'} } },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
             }
         });
 
-        // Range Chart
         new Chart(document.getElementById('rangeChart'), {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    {
-                        label: 'Bereich',
-                        data: statsData.map(d => [d.quartiles.min, d.quartiles.max]),
-                        backgroundColor: 'rgba(0, 122, 255, 0.2)',
-                        borderColor: '#007AFF', borderWidth: 1, barPercentage: 0.4,
-                        borderSkipped: false
-                    },
-                    {
-                        type: 'scatter', label: 'Mittelwert',
-                        data: statsData.map(d => d.mean),
-                        backgroundColor: '#AF52DE', pointRadius: 5
-                    }
+                    { label: 'Bereich', data: statsData.map(d => [d.quartiles.min, d.quartiles.max]), backgroundColor: 'rgba(0, 122, 255, 0.15)', borderColor: '#007AFF', borderWidth: 1, barPercentage: 0.5 },
+                    { type: 'scatter', label: 'Mean', data: statsData.map(d => d.mean), backgroundColor: '#AF52DE', pointRadius: 4 }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { y: { min: 0, max: 6, grid: {color:'rgba(128,128,128,0.1)'} }, x: { grid: {display:false} } }
+                scales: { y: { min: 0, max: 6, grid: {color:'rgba(128,128,128,0.05)'} }, x: { grid: {display:false} } },
+                plugins: { legend: { display: false } }
             }
         });
 
-        // Radar Chart
         new Chart(document.getElementById('radarChart'), {
             type: 'radar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: 'Durchschnitt',
-                    data: statsData.map(d => d.mean),
-                    backgroundColor: 'rgba(10, 132, 255, 0.2)',
-                    borderColor: '#0A84FF', pointBackgroundColor: '#fff'
-                }]
+                datasets: [{ label: 'Ø Zustimmung', data: statsData.map(d => d.mean), backgroundColor: 'rgba(10, 132, 255, 0.15)', borderColor: '#0A84FF', pointBackgroundColor: '#fff', borderWidth: 2 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { r: { min: 0, max: 5, grid: {color:'rgba(128,128,128,0.1)'}, angleLines: {color:'rgba(128,128,128,0.1)'} } }
+                scales: { r: { min: 0, max: 5, ticks: { display: false }, grid: {color:'rgba(128,128,128,0.1)'}, angleLines: {color:'rgba(128,128,128,0.1)'} } },
+                plugins: { legend: { display: false } }
             }
         });
 
-        // Animations Observer
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.05 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
     </script>
 </body>
 </html>
